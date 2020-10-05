@@ -10,5 +10,6 @@ public class DemoApplication {
 		SpringApplication.run(DemoApplication.class, args);
 
 		System.out.println("THis app runs just fine, lets push it to github ");
+		System.out.println("this is the second line that i have written");
 	}
 }
