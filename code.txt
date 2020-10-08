@@ -1,0 +1,102 @@
+<dependency>
+      <groupId>org.springframework.session</groupId>
+      <artifactId>spring-session-data-redis</artifactId>
+</dependency>
+<dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+
+
+
+
+spring.session.store-type=redis
+spring.redis.host=localhost
+spring.redis.port=6379
+spring.session.redis.flush-mode=on_save
+spring.session.redis.namespace=spring:session
+
+
+
+
+
+
+
+package com.keepcodeclean.redissessions;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpSession;
+
+@Controller
+public class SessionController {
+
+    @GetMapping("/")
+    public String home(Model model, HttpSession session) {
+        String preferredLang = (String) session.getAttribute("preferredLang");
+
+        model.addAttribute("preferredLang", preferredLang);
+        model.addAttribute("sessionId", session.getId());
+
+        return "index";
+    }
+
+    @GetMapping("/setLang")
+    public String setLang(@RequestParam("preferredLang") String preferredLang, HttpSession session) {
+        session.setAttribute("preferredLang", preferredLang);
+        return "redirect:/";
+    }
+
+    @PostMapping("/destroy")
+    public String destroySession(HttpSession session) {
+        session.invalidate();
+        return "redirect:/";
+    }
+    
+}
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Spring Boot Session Example</title>
+    </head>
+    <body>
+        <div>
+            <form th:action="@{/setLang}" method="GET">
+                <div>
+                    <label>Language</label>
+                    <select name="preferredLang">
+                        <option selected="true" value="English">English</option>
+                        <option value="German">German</option>
+                        <option value="Ukrainian">Ukrainian</option>
+                    </select>
+                </div>
+                <div>
+                    <input type="submit" value="Save" />
+                </div>
+            </form>
+        </div>
+        <div>
+            <h2>Preferred Language</h2>
+            <span th:text="${preferredLang}" />
+        </div>
+        <div>
+            <h2>Session ID</h2>
+            Current Session ID is <span th:text="${sessionId}" />
+        </div>
+        <div>
+            <form th:action="@{/destroy}" method="post">
+                <input type="submit" value="Destroy Session" />
+            </form>
+        </div>
+    </body>
+</html>
